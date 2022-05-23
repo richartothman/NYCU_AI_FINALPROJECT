@@ -294,21 +294,39 @@ class Game():
 
     def update(self):
         if self.GameOver:return
-        for i,ball in enumerate(self.balls):
-            ball.move()
-            ball.bounce()
-            for ball2 in self.balls[i+1:]:
-                self.collide(ball,ball2)
-            if ball.isSink(self.pockets):
-                if not ball.isCueball:
-                    self.sinked += 1
-                    self.balls.remove(ball)
-                else:
-                    self.GameOver = True
-                    self.balls.remove(ball)
-        if len(self.balls) == 1 and self.balls[0].isCueball:
-            self.Iswin = True
+        if not self.isStopped():
+            for i,ball in enumerate(self.balls):
+                ball.move()
+                ball.bounce()
+                for ball2 in self.balls[i+1:]:
+                    self.collide(ball,ball2)
+                if ball.isSink(self.pockets):
+                    if not ball.isCueball:
+                        self.sinked += 1
+                        self.balls.remove(ball)
+                    else:
+                        self.GameOver = True
+                        self.balls.remove(ball)
+            if len(self.balls) == 1 and self.balls[0].isCueball:
+                self.Iswin = True
 
+    def full_update(self):
+        if self.GameOver:return
+        while not self.isStopped():
+            for i,ball in enumerate(self.balls):
+                ball.move()
+                ball.bounce()
+                for ball2 in self.balls[i+1:]:
+                    self.collide(ball,ball2)
+                if ball.isSink(self.pockets):
+                    if not ball.isCueball:
+                        self.sinked += 1
+                        self.balls.remove(ball)
+                    else:
+                        self.GameOver = True
+                        self.balls.remove(ball)
+            if len(self.balls) == 1 and self.balls[0].isCueball:
+                self.Iswin = True
 
     def collide(self,ball1,ball2):
         dx = ball1.x - ball2.x
