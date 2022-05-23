@@ -320,8 +320,8 @@ class Game():
             angle1, speed1 = addVectors(ball1.angle, 0, angle, 2*ball2.speed*ball2.mass/total_mass)
             angle2, speed2 = addVectors(ball2.angle, 0, angle+pi, 2*ball1.speed*ball1.mass/total_mass)
 
-            if speed1 == 0:speed1 = speed2*0.1
-            if speed2 == 0:speed2 = speed1*0.1
+            if speed1 == 0:speed1 = speed2*0.2
+            if speed2 == 0:speed2 = speed1*0.2
 
             if ball2.speed == 0:
                 if ball1.angle%(2*pi) > angle2%(2*pi):
