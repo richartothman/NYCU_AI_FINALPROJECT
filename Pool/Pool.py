@@ -42,7 +42,9 @@ class Ball():
             self.angle = 0
         self.x += sin(self.angle)*self.speed
         self.y -= cos(self.angle)*self.speed
-        
+    def getPos(self):
+        return (self.x,self.y)
+
     def bounce(self):
         #[[width,20], [width-margin,50],[width-margin,height-50],[width,height-20]]
         if (self.x + radius > width - margin  and 
@@ -289,13 +291,15 @@ class Game():
     def drawCuestick(self,cuex,cuey,display):
         x, y = pygame.mouse.get_pos()
         tangent = (degrees(atan2((cuey - y), (cuex - x))))
-        pygame.draw.line(display, WHITE, (cuex + 30*cos(radians(tangent)), cuey + 30*sin(radians(tangent))), (cuex, cuey), 1)
+        pygame.draw.line(display, WHITE, (cuex + 10000*cos(radians(tangent)), cuey + 10000*sin(radians(tangent))), (cuex, cuey), 1)
         pygame.draw.line(display, BROWN, (x, y), (cuex, cuey), 3)
 
     def update(self):
         if self.GameOver:return
         if not self.isStopped():
             for i,ball in enumerate(self.balls):
+                # if ball.isCueball:
+                #     print(ball.angle%(2*pi))
                 ball.move()
                 ball.bounce()
                 for ball2 in self.balls[i+1:]:
@@ -334,42 +338,79 @@ class Game():
         dist = hypot(dx,dy)
         if dist < radius*2:
             angle = atan2(dy,dx) + 0.5*pi
-            total_mass = ball1.mass + ball2.mass
-            angle1, speed1 = addVectors(ball1.angle, 0, angle, 2*ball2.speed*ball2.mass/total_mass)
-            angle2, speed2 = addVectors(ball2.angle, 0, angle+pi, 2*ball1.speed*ball1.mass/total_mass)
-
-            if speed1 == 0:speed1 = speed2*0.2
-            if speed2 == 0:speed2 = speed1*0.2
-
+            angle1, speed1 = addVectors(ball1.angle, 0, angle, ball2.speed)
+            angle2, speed2 = addVectors(ball2.angle, 0, angle+pi, ball1.speed)
+            angledif = abs(ball1.angle%(2*pi)-(atan2(dy,dx) - 0.5*pi)%(2*pi))
+            if speed1 == 0:speed1 = speed2*0.15
+            if speed2 == 0:speed2 = speed1*0.15
             if ball2.speed == 0:
                 if ball1.angle%(2*pi) > angle2%(2*pi):
-                    if  pi*3/2 < ball1.angle%(2*pi) <= pi*2 and 0 < angle2%(2*pi) <= pi/2:
-                        ball1.angle,ball1.speed =  ball1.angle - (pi/2 + (ball1.angle%(2*pi) - angle2%(2*pi))%(2*pi))%(2*pi) , speed1
+                    if  pi*3/2 < ball1.angle%(2*pi) < pi*2 and 0 < angle2%(2*pi) < pi/2:
+                        ball1.angle =  ball1.angle - (pi/2 + (ball1.angle%(2*pi) - angle2%(2*pi))%(2*pi))%(2*pi)
                     else:
-                        ball1.angle,ball1.speed =  ball1.angle + (pi/2 - (ball1.angle%(2*pi) - angle2%(2*pi))%(2*pi))%(2*pi) , speed1
+                        ball1.angle =  ball1.angle + (pi/2 - (ball1.angle%(2*pi) - angle2%(2*pi))%(2*pi))%(2*pi)
 
 
                 else:
-                    if  pi*3/2 < angle2%(2*pi) <= pi*2 and 0 < ball1.angle%(2*pi) <= pi/2:
-                        ball1.angle,ball1.speed =  ball1.angle + (pi/2 - (ball1.angle%(2*pi) - angle2%(2*pi))%(2*pi))%(2*pi) , speed1
+                    if  pi*3/2 < angle2%(2*pi) < pi*2 and 0 < ball1.angle%(2*pi) < pi/2:
+                        ball1.angle =  ball1.angle + (pi/2 - (ball1.angle%(2*pi) - angle2%(2*pi))%(2*pi))%(2*pi)
                     else:
-                        ball1.angle,ball1.speed =  ball1.angle - (pi/2 + (ball1.angle%(2*pi) - angle2%(2*pi))%(2*pi))%(2*pi) , speed1
+                        ball1.angle =  ball1.angle - (pi/2 + (ball1.angle%(2*pi) - angle2%(2*pi))%(2*pi))%(2*pi)
             else:
                 ball1.angle,ball1.speed = angle1, speed1
 
+            ball1.speed = speed1
 
             ball2.angle,ball2.speed = angle2, speed2
+            print(angledif)
+            if angledif > 2:
+                overlap = 0.5 * (20-dist)
+                ball1.x += sin(angle) * overlap
+                ball1.y -= cos(angle) * overlap
+                ball2.x -= sin(angle) * overlap
+                ball2.y += cos(angle) * overlap
+                dx = ball1.x - ball2.x
+                dy = ball1.y - ball2.y
+                dist = hypot(dx,dy)
+                angle = atan2(dy,dx) + 0.5*pi
+                angle1, speed1 = addVectors(ball1.angle, 0, angle, ball2.speed)
+                angle2, speed2 = addVectors(ball2.angle, 0, angle+pi, ball1.speed)
+                angledif = abs(ball1.angle%(2*pi)-(atan2(dy,dx) - 0.5*pi)%(2*pi))
+                print(angledif)
+            else:
+                ball1.speed = ball2.speed * (angledif/2)
+                ball2.speed *= 1 - (angledif/2)
 
-            ball1.speed *= 0.95
-            ball2.speed *= 0.95
-
-            overlap = 0.5 * (20-dist)
+            overlap = 0.5 * (20-dist) + 0.01
             ball1.x += sin(angle) * overlap
             ball1.y -= cos(angle) * overlap
             ball2.x -= sin(angle) * overlap
             ball2.y += cos(angle) * overlap
+    def getAllballPos(self):
+        ballpos= []
+        for ball in self.balls:
+            ballpos.append(ball.getPos())
+        return ballpos
+    
+    def getDistribution(self):
+        fitness = 0
+        dist = 0
+        ballpos = self.getAllballPos()
+        for ball in self.balls:
+            if ball.isCueball:continue
+            pockPos = self.pockets.pos
+            ballpos = ball.getPos()
+            Pdist = [hypot(ppos[0]-ballpos[0],ppos[1]-ballpos[1]) for ppos in pockPos]
+            dist += min(Pdist)
+        if dist == 0: dist = 1000000000
+        fitness = 1/dist 
+        for i in range(16-len(self.balls)):
+            fitness = 1/dist + 0.1
+        return fitness
+        
 
     def ForcetoCue(self,angle,force):
+        if force > 2: force = 2
         self.balls[0].angle = angle
         self.balls[0].speed = force
 

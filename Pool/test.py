@@ -23,16 +23,20 @@ def callback_generation(ga_instance):
     print("Generation = {generation}".format(generation=ga_instance.generations_completed))
     print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
 
-input_layer  = tensorflow.keras.layers.Input(3)
-dense_layer1 = tensorflow.keras.layers.Dense(5, activation="tanh")(input_layer)
-output_layer = tensorflow.keras.layers.Dense(2, activation="linear")(dense_layer1)
-
-model = tensorflow.keras.Model(inputs=input_layer, outputs=output_layer)
-
+# input_layer  = tensorflow.keras.layers.Input(3)
+# dense_layer1 = tensorflow.keras.layers.Dense(5, activation="relu")(input_layer)
+# dense_layer2 = tensorflow.keras.layers.Dense(4, activation="relu")(dense_layer1)
+# output_layer = tensorflow.keras.layers.Dense(2, activation="linear")(dense_layer2)
+model = tensorflow.keras.Sequential()
+# model = tensorflow.keras.Model(inputs=input_layer, outputs=output_layer)
+model.add(tensorflow.keras.layers.Dense(6, activation="relu"))
+model.add(tensorflow.keras.layers.Dense(3, activation="relu"))
+model.add(tensorflow.keras.layers.Dense(2, activation="linear"))
+model.build((None, 3))
 weights_vector = pygad.kerasga.model_weights_as_vector(model=model)
 
 keras_ga = pygad.kerasga.KerasGA(model=model,
-                                 num_solutions=10)
+                                 num_solutions=100)
 
 # Data inputs
 data_inputs = numpy.array([[0.02, 0.1, 0.15],
@@ -46,24 +50,23 @@ data_outputs = numpy.array([[0.1,0.13],
                             [1.3,1.9],
                             [2.5,3.0]])
 
-num_generations = 250
-num_parents_mating = 5
+num_generations = 100
+num_parents_mating = 10
 initial_population = keras_ga.population_weights
 mutation_percent = 10
-parent_selection_type = "rank"
 crossover_type = "two_points"
 mutation_type = "random"
-keep_parents = 1
+keep_parents = 10
 ga_instance = pygad.GA( num_generations=num_generations, 
                         num_parents_mating=num_parents_mating, 
                         initial_population=initial_population,
                         fitness_func=fitness_func,
                         mutation_percent_genes=mutation_percent,
-                        parent_selection_type=parent_selection_type,
                         crossover_type=crossover_type,
                         mutation_type=mutation_type,
-                        keep_parents=keep_parents,
-                      on_generation=callback_generation)
+                        # keep_parents=keep_parents,
+                    #   on_generation=callback_generation
+                      )
 ga_instance.run()
 
 # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.

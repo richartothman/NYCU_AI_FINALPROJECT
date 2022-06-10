@@ -7,11 +7,10 @@ import Pool
 
 class App():
     def __init__(self):
-        py = pygame.init()
-        self.board = Pool.Game()
+        pygame.init()
         self.run = True
 
-    def render(self):
+    def render(self,pool):
         '''-------------------------------------------------'''
         self.display = pygame.display.set_mode((Pool.width,Pool.height))
         pygame.display.set_caption("8 Ball Pool")
@@ -20,17 +19,19 @@ class App():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.run = False
-                if event.type == pygame.MOUSEBUTTONDOWN and self.board.isStopped() and not self.board.Iswin and not self.board.GameOver:
+                if event.type == pygame.MOUSEBUTTONDOWN and pool.isStopped() and not pool.Iswin and not pool.GameOver:
                     x, y = pygame.mouse.get_pos()
-                    dx = self.board.balls[0].x - x
-                    dy = self.board.balls[0].y - y
+                    dx = pool.balls[0].x - x
+                    dy = pool.balls[0].y - y
                     angle = atan2(dy,dx) + 0.5*pi
                     force = hypot(dx,dy)/100
-                    self.board.ForcetoCue(angle,force)
-            
-            self.board.draw(self.display)
-            self.board.update()
+                    pool.ForcetoCue(angle,force)
+            #test = deepcopy(pool) use deep copy to make a seperate copy of the object
+            pool.draw(self.display)
+            pool.update()
+            # print(pool.getDistribution())
             pygame.display.flip()
 
 Play = App()
-Play.render()
+Game = Pool.Game()
+Play.render(Game)
