@@ -29,7 +29,7 @@ class Ball():
         self.speed = speed
         self.angle = angle
         self.mass = mass
-        self.drag = 0.9988
+        self.drag = 0.998
     def draw(self,display):
         pygame.draw.circle(display, self.color, (self.x,self.y),radius)
         if self.Ballnum > 8:
@@ -245,20 +245,21 @@ class Game():
             Ball(1,COLORS[0],(s, height/2 - 4*radius)),
             Ball(2,COLORS[1],(s + 2*(radius-1.5), height/2 - 3*radius)),
             Ball(3,COLORS[2],(s, height/2 - 2*radius)),
-            Ball(4,COLORS[3],(s + 4*(radius-1.5), height/2 - 2*radius)),
-            Ball(5,COLORS[4],(s + 2*(radius-1.5), height/2 - 1*radius)),
-            Ball(6,COLORS[5],(s, height/2)),
-            Ball(7,COLORS[6],(s + 6*(radius-1.5), height/2 - 1*radius)),
-            Ball(8,COLORS[7],(s + 4*(radius-1.5), height/2)),
-            Ball(9,COLORS[0],(s + 8*(radius-1.5), height/2)),
-            Ball(10,COLORS[1],(s + 6*(radius-1.5), height/2 + 1*radius)),
-            Ball(11,COLORS[2],(s + 2*(radius-1.5), height/2 + 1*radius)),
-            Ball(12,COLORS[3],(s, height/2 + 2*radius)),
-            Ball(13,COLORS[4],(s + 4*(radius-1.5), height/2 + 2*radius)),
-            Ball(14,COLORS[5],(s + 2*(radius-1.5), height/2 + 3*radius)),
-            Ball(15,COLORS[6],(s, height/2 + 4*radius)),
+            # Ball(4,COLORS[3],(s + 4*(radius-1.5), height/2 - 2*radius)),
+            # Ball(5,COLORS[4],(s + 2*(radius-1.5), height/2 - 1*radius)),
+            # Ball(6,COLORS[5],(s, height/2)),
+            # Ball(7,COLORS[6],(s + 6*(radius-1.5), height/2 - 1*radius)),
+            # Ball(8,COLORS[7],(s + 4*(radius-1.5), height/2)),
+            # Ball(9,COLORS[0],(s + 8*(radius-1.5), height/2)),
+            # Ball(10,COLORS[1],(s + 6*(radius-1.5), height/2 + 1*radius)),
+            # Ball(11,COLORS[2],(s + 2*(radius-1.5), height/2 + 1*radius)),
+            # Ball(12,COLORS[3],(s, height/2 + 2*radius)),
+            # Ball(13,COLORS[4],(s + 4*(radius-1.5), height/2 + 2*radius)),
+            # Ball(14,COLORS[5],(s + 2*(radius-1.5), height/2 + 3*radius)),
+            # Ball(15,COLORS[6],(s, height/2 + 4*radius)),
         ]
         self.sinked = 0
+        self.sinkedBalls = []
         self.GameOver = False
         self.Iswin = False
     
@@ -308,6 +309,7 @@ class Game():
                 if ball.isSink(self.pockets):
                     if not ball.isCueball:
                         self.sinked += 1
+                        self.sinkedBalls.append(ball)
                         self.balls.remove(ball)
                     else:
                         self.GameOver = True
@@ -326,6 +328,7 @@ class Game():
                 if ball.isSink(self.pockets):
                     if not ball.isCueball:
                         self.sinked += 1
+                        self.sinkedBalls.append(ball)
                         self.balls.remove(ball)
                     else:
                         self.GameOver = True
@@ -338,17 +341,19 @@ class Game():
         dy = ball1.y - ball2.y
         dist = hypot(dx,dy)
         if dist < radius*2:
-            # print(ball1.Ballnum,ball2.Ballnum)
+            # print("ball:",ball1.Ballnum,ball2.Ballnum)
             angle = atan2(dy,dx) + 0.5*pi
             angle1, speed1 = addVectors(ball1.angle, 0, angle, ball2.speed)
             angle2, speed2 = addVectors(ball2.angle, 0, angle+pi, ball1.speed)
-            # print(abs(ball1.angle%(2*pi)-(atan2(dy,dx) - 0.5*pi)%(2*pi)),abs(ball2.angle%(2*pi)-(atan2(dy,dx) - 0.5*pi)%(2*pi)))
+            # print(ball1.angle,atan2(dy,dx) - 0.5*pi,ball2.angle)
+            # print(abs(ball1.angle-(atan2(dy,dx) - 0.5*pi))%(2*pi),abs((ball2.angle-atan2(dy,dx) - 0.5*pi)%(2*pi)))
             angledif = min(abs(ball1.angle%(2*pi)-(atan2(dy,dx) - 0.5*pi)%(2*pi)),abs(ball2.angle%(2*pi)-(atan2(dy,dx) - 0.5*pi)%(2*pi)))
             # angledif = abs(ball1.angle%(2*pi)-(atan2(dy,dx) - 0.5*pi)%(2*pi))
             if ball2.speed == 0:
                 if ball1.angle%(2*pi) > angle2%(2*pi):
                     if  pi*3/2 < ball1.angle%(2*pi) < pi*2 and 0 < angle2%(2*pi) < pi/2:
                         ball1.angle =  ball1.angle - (pi/2 + (ball1.angle%(2*pi) - angle2%(2*pi))%(2*pi))%(2*pi)
+                        angledif = (2*pi)-angledif
                     else:
                         ball1.angle =  ball1.angle + (pi/2 - (ball1.angle%(2*pi) - angle2%(2*pi))%(2*pi))%(2*pi)
 
@@ -356,6 +361,7 @@ class Game():
                 else:
                     if  pi*3/2 < angle2%(2*pi) < pi*2 and 0 < ball1.angle%(2*pi) < pi/2:
                         ball1.angle =  ball1.angle + (pi/2 - (ball1.angle%(2*pi) - angle2%(2*pi))%(2*pi))%(2*pi)
+                        angledif = (2*pi)-angledif
                     else:
                         ball1.angle =  ball1.angle - (pi/2 + (ball1.angle%(2*pi) - angle2%(2*pi))%(2*pi))%(2*pi)
             else:
@@ -365,15 +371,17 @@ class Game():
 
             ball2.angle,ball2.speed = angle2, speed2
             # print(ball1.speed,ball2.speed)
-            # print(angledif)
+            print(angledif)
             angledif = sigmoid(angledif)
             # print(angledif)
-            if ball2.speed == 0 and angledif > 0.01:
-                ball2.speed = ball1.speed *(1-angledif)
-                ball1.speed *=  angledif
-            elif ball1.speed == 0 and angledif < 0.99:
-                ball1.speed = ball2.speed * angledif
-                ball2.speed *= 1 - angledif
+            if ball2.speed < ball1.speed:
+                if not angledif>0.99 :
+                    ball2.speed = ball1.speed *(1-angledif)
+                    ball1.speed *=  angledif
+            elif ball1.speed < ball2.speed:
+                if not angledif>0.99 :
+                    ball1.speed = ball2.speed * angledif
+                    ball2.speed *= 1 - angledif
 
             # if angledif > 2:
             #     overlap = 0.5 * (20-dist)
@@ -404,7 +412,7 @@ class Game():
             #     else:
 
             # print(ball1.speed,ball2.speed)
-            ball1.speed *=0.99
+            ball1.speed *=0.99 
             ball2.speed *=0.99
             overlap = 0.5 * (20-dist) + 0.05
             ball1.x += sin(angle) * overlap
@@ -415,6 +423,8 @@ class Game():
         ballpos= []
         for ball in self.balls:
             ballpos.append(ball.getPos())
+        for Sball in self.sinkedBalls:
+            ballpos.insert(Sball.Ballnum,Sball.getPos())
         return ballpos
     
     def getDistribution(self):
