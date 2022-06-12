@@ -42,7 +42,9 @@ if __name__ == '__main__':
     NewGame = Pool.Game()
 
     for i in range(1,MoveNum+1):
+        tensorflow.keras.utils.get_custom_objects().update({'mapping_to_target_range': tensorflow.keras.layers.Activation(mapping_to_target_range)})
         Testmodel = tensorflow.keras.models.load_model(
-            "ALL_model\\"+str(int(ModelID))+"\\"+str(i)+"\\best")                                          
+            "ALL_model\\"+str(int(ModelID))+"test\\"+str(i)+"\\best.h5")                                          
         UseModel(NewGame,Testmodel)
+        # Testmodel.save("ALL_model\\"+str(int(ModelID))+"test\\"+str(i)+"\\best.h5")
 
