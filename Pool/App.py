@@ -14,7 +14,6 @@ class App():
         '''-------------------------------------------------'''
         self.display = pygame.display.set_mode((Pool.width,Pool.height))
         pygame.display.set_caption("8 Ball Pool")
-
         while self.run:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -26,10 +25,8 @@ class App():
                     angle = atan2(dy,dx) + 0.5*pi
                     force = hypot(dx,dy)/100
                     pool.ForcetoCue(angle,force)
-            #test = deepcopy(pool) use deep copy to make a seperate copy of the object
             pool.draw(self.display)
             pool.update()
-            # print(pool.getDistribution())
             pygame.display.flip()
 
 Play = App()

@@ -245,23 +245,24 @@ class Game():
             Ball(1,COLORS[0],(s, height/2 - 4*radius)),
             Ball(2,COLORS[1],(s + 2*(radius-1.5), height/2 - 3*radius)),
             Ball(3,COLORS[2],(s, height/2 - 2*radius)),
-            # Ball(4,COLORS[3],(s + 4*(radius-1.5), height/2 - 2*radius)),
-            # Ball(5,COLORS[4],(s + 2*(radius-1.5), height/2 - 1*radius)),
-            # Ball(6,COLORS[5],(s, height/2)),
-            # Ball(7,COLORS[6],(s + 6*(radius-1.5), height/2 - 1*radius)),
-            # Ball(8,COLORS[7],(s + 4*(radius-1.5), height/2)),
-            # Ball(9,COLORS[0],(s + 8*(radius-1.5), height/2)),
-            # Ball(10,COLORS[1],(s + 6*(radius-1.5), height/2 + 1*radius)),
-            # Ball(11,COLORS[2],(s + 2*(radius-1.5), height/2 + 1*radius)),
-            # Ball(12,COLORS[3],(s, height/2 + 2*radius)),
-            # Ball(13,COLORS[4],(s + 4*(radius-1.5), height/2 + 2*radius)),
-            # Ball(14,COLORS[5],(s + 2*(radius-1.5), height/2 + 3*radius)),
-            # Ball(15,COLORS[6],(s, height/2 + 4*radius)),
+            Ball(4,COLORS[3],(s + 4*(radius-1.5), height/2 - 2*radius)),
+            Ball(5,COLORS[4],(s + 2*(radius-1.5), height/2 - 1*radius)),
+            Ball(6,COLORS[5],(s, height/2)),
+            Ball(7,COLORS[6],(s + 6*(radius-1.5), height/2 - 1*radius)),
+            Ball(8,COLORS[7],(s + 4*(radius-1.5), height/2)),
+            Ball(9,COLORS[0],(s + 8*(radius-1.5), height/2)),
+            Ball(10,COLORS[1],(s + 6*(radius-1.5), height/2 + 1*radius)),
+            Ball(11,COLORS[2],(s + 2*(radius-1.5), height/2 + 1*radius)),
+            Ball(12,COLORS[3],(s, height/2 + 2*radius)),
+            Ball(13,COLORS[4],(s + 4*(radius-1.5), height/2 + 2*radius)),
+            Ball(14,COLORS[5],(s + 2*(radius-1.5), height/2 + 3*radius)),
+            Ball(15,COLORS[6],(s, height/2 + 4*radius)),
         ]
         self.sinked = 0
         self.sinkedBalls = []
         self.GameOver = False
         self.Iswin = False
+        self.whiteballcontact = 0
     
     def draw(self,display):
         if self.GameOver:
@@ -299,8 +300,6 @@ class Game():
         if self.GameOver:return
         if not self.isStopped():
             for i,ball in enumerate(self.balls):
-                # if ball.isCueball:
-                #     print(ball.angle%(2*pi))
                 ball.move()
                 ball.bounce()
                 for ball2 in self.balls[i+1:]:
@@ -341,6 +340,8 @@ class Game():
         dy = ball1.y - ball2.y
         dist = hypot(dx,dy)
         if dist < radius*2:
+            if ball1.isCueball or ball2.isCueball:
+                self.whiteballcontact += 1
             # print("ball:",ball1.Ballnum,ball2.Ballnum)
             angle = atan2(dy,dx) + 0.5*pi
             angle1, speed1 = addVectors(ball1.angle, 0, angle, ball2.speed)
@@ -371,7 +372,7 @@ class Game():
 
             ball2.angle,ball2.speed = angle2, speed2
             # print(ball1.speed,ball2.speed)
-            print(angledif)
+            # print(angledif)
             angledif = sigmoid(angledif)
             # print(angledif)
             if ball2.speed < ball1.speed:
@@ -383,42 +384,16 @@ class Game():
                     ball1.speed = ball2.speed * angledif
                     ball2.speed *= 1 - angledif
 
-            # if angledif > 2:
-            #     overlap = 0.5 * (20-dist)
-            #     ball1.x += sin(angle) * overlap
-            #     ball1.y -= cos(angle) * overlap
-            #     ball2.x -= sin(angle) * overlap
-            #     ball2.y += cos(angle) * overlap
-            #     dx = ball1.x - ball2.x
-            #     dy = ball1.y - ball2.y
-            #     dist = hypot(dx,dy)
-            #     angle = atan2(dy,dx) + 0.5*pi
-            #     angle1, speed1 = addVectors(ball1.angle, 0, angle, ball2.speed)
-            #     angle2, speed2 = addVectors(ball2.angle, 0, angle+pi, ball1.speed)
-            #     angledif = abs(ball1.angle%(2*pi)-(atan2(dy,dx) - 0.5*pi)%(2*pi))
-                # ball1.speed = ball2.speed * (1 - (angledif/(2*pi)))
-                # ball2.speed *= (angledif/(2*pi))
-                # print(angledif)
-            #     if ball1.speed == 0 or ball2.speed != 0:
-            #         ball1.speed = ball2.speed * (angledif/2)
-            #         ball2.speed *= 1 - (angledif%(pi))
-            #     else:
-            #         ball1.speed *= 1 - (angledif%(pi))
-            #         ball2.speed *= ball1.speed * (angledif/2)
-            # else:
-            #     if ball1.speed == 0 or ball2.speed != 0:
-            #         ball1.speed = ball2.speed * (angledif/2)
-            #         ball2.speed *= 1 - (angledif/2)
-            #     else:
-
             # print(ball1.speed,ball2.speed)
             ball1.speed *=0.99 
             ball2.speed *=0.99
             overlap = 0.5 * (20-dist) + 0.05
+            
             ball1.x += sin(angle) * overlap
             ball1.y -= cos(angle) * overlap
             ball2.x -= sin(angle) * overlap
             ball2.y += cos(angle) * overlap
+            
     def getAllballPos(self):
         ballpos= []
         for ball in self.balls:
@@ -428,8 +403,11 @@ class Game():
         return ballpos
     
     def getDistribution(self):
+        if self.Iswin:
+            return 100
         fitness = 0
         dist = 0
+        Bdist = 0
         ballpos = self.getAllballPos()
         for ball in self.balls:
             if ball.isCueball:continue
@@ -437,13 +415,15 @@ class Game():
             ballpos = ball.getPos()
             Pdist = [hypot(ppos[0]-ballpos[0],ppos[1]-ballpos[1]) for ppos in pockPos]
             dist += min(Pdist)
+            for ball2 in self.balls[ball.Ballnum+1:]:
+                ball2pos = ball2.getPos()
+                Bdist += hypot(ball2pos[0]-ballpos[0],ball2pos[1]-ballpos[1])
         if dist == 0: dist = 1000000000
-        fitness = 1/dist 
+        fitness = (len(self.balls)-1)/dist + Bdist/((len(self.balls)-1)*1000000) + self.whiteballcontact*0.001
         for i in range(16-len(self.balls)):
-            fitness = 1/dist + 0.1
+            fitness += 1
         return fitness
         
-
     def ForcetoCue(self,angle,force):
         if force > 2: force = 2
         self.balls[0].angle = angle
