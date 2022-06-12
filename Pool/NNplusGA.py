@@ -48,7 +48,7 @@ def fitness_func(solution, sol_idx):
     if solution_fitness > maxfitness:
         maxfitness = solution_fitness
         Best = model_weights_matrix
-        model.save("ALL_model\\"+str(int(curTime))+"\\"+str(curIndex)+"\\best")
+    
     return solution_fitness
 
 def callback_generation(ga_instance):
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     model.add(tensorflow.keras.layers.Dense(1, activation=mapping_to_target_range))
     model.build((None,32))
 
-    # for i in range(1,15+1):
+    # for i in range(1,14+1):
     #     Testmodel = tensorflow.keras.models.load_model(
     #         "ALL_model\\"+str(int(curTime))+"\\"+str(i)+"\\best")
     #     UseModel(Game,Testmodel)    
@@ -76,19 +76,20 @@ if __name__ == '__main__':
     solution_fitness = 0
 
     best_solution_weights = None
+    prevbest = 0
     while solution_fitness < 15:
         weights_vector = pygad.kerasga.model_weights_as_vector(model=model)
 
         keras_ga = pygad.kerasga.KerasGA(model=model,
-                                        num_solutions=20)
+                                        num_solutions=50)
         Best = best_solution_weights
         num_generations = 5
-        num_parents_mating = 10
+        num_parents_mating = 24
         initial_population = keras_ga.population_weights
         mutation_percent = 10
         crossover_type = "two_points"
         mutation_type = "random"
-        keep_parents = 2
+        keep_parents = 5
         ga_instance = pygad.GA( num_generations=num_generations, 
                                 num_parents_mating=num_parents_mating, 
                                 initial_population=initial_population,
@@ -101,6 +102,7 @@ if __name__ == '__main__':
         ga_instance.run()
 
         # Returning the details of the best solution.
+
         solution, solution_fitness, solution_idx = ga_instance.best_solution()
         print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
         print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
@@ -108,7 +110,8 @@ if __name__ == '__main__':
         # Fetch the parameters of the best solution.
         best_solution_weights = pygad.kerasga.model_weights_as_matrix(model=model,
                                                                     weights_vector=solution)
-        model.set_weights(best_solution_weights)     
+        model.set_weights(best_solution_weights)
+        model.save("ALL_model\\"+str(int(curTime))+"\\"+str(curIndex)+"\\best")    
         UseModel(Game,model,True,False)
         NewGame = Pool.Game()         
         for i in range(1,curIndex+1):
@@ -117,7 +120,6 @@ if __name__ == '__main__':
                     "ALL_model\\"+str(int(curTime))+"\\"+str(i)+"\\best")
                 UseModel(NewGame,Testmodel)            
             except IOError:
-                pass
-            
+                pass   
         curIndex += 1
 
