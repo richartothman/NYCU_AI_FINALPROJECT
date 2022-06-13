@@ -16,8 +16,6 @@ def Generate_Bestshots(game):
         if New.GameOver: continue
 
         curpos = New.getAllballPos()
-        # print(prevpos[1:])
-        # print(prevpos)
         if prevpos[1:] == curpos[1:]:continue
 
         CurrDist = New.getDistribution()
@@ -29,11 +27,11 @@ def Generate_Bestshots(game):
 
 if __name__ == '__main__':
     NewGame = Pool.Game()
-
+    f = open("ALL_model\SEARCH")
     while not NewGame.Iswin:
         shot = Generate_Bestshots(NewGame)    
-
-        print(shot)
+        
+        f.write(shot)
         NewGame.ForcetoCue(radians(shot),2)
         while not NewGame.isStopped():
             NewGame.update()
