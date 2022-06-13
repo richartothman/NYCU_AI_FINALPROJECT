@@ -1,7 +1,8 @@
 
 # Project Title
 NYCU 2022 AI FINALPROJECT
-![pool](https://user-images.githubusercontent.com/91297984/173283529-ec980a12-dadd-4294-9d42-8e73fc28d367.png)
+
+![poolpic](https://user-images.githubusercontent.com/91297984/173284035-3f8c9f02-f546-441b-b88e-6ef3921cd84c.png)
 ## Description
 An in-depth paragraph about your project and overview of use.
 
