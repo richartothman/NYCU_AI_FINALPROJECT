@@ -65,12 +65,12 @@ if __name__ == '__main__':
     model.add(tensorflow.keras.layers.Dense(1, activation=mapping_to_target_range))
     model.build((None,32))
 
+    tensorflow.keras.utils.get_custom_objects().update({'mapping_to_target_range': tensorflow.keras.layers.Activation(mapping_to_target_range)})
     # for i in range(1,14+1):
     #     Testmodel = tensorflow.keras.models.load_model(
     #         "ALL_model\\"+str(int(curTime))+"\\"+str(i)+"\\best")
     #     UseModel(Game,Testmodel)    
     curTime = time.time()
-
     maxfitness = 0
     curIndex = 1
     solution_fitness = 0
@@ -111,13 +111,13 @@ if __name__ == '__main__':
         best_solution_weights = pygad.kerasga.model_weights_as_matrix(model=model,
                                                                     weights_vector=solution)
         model.set_weights(best_solution_weights)
-        model.save("ALL_model\\"+str(int(curTime))+"\\"+str(curIndex)+"\\best")    
+        model.save("ALL_model\\"+str(int(curTime))+"\\"+str(curIndex)+"\\best.h5")    
         UseModel(Game,model,True,False)
         NewGame = Pool.Game()         
         for i in range(1,curIndex+1):
             try:
                 Testmodel = tensorflow.keras.models.load_model(
-                    "ALL_model\\"+str(int(curTime))+"\\"+str(i)+"\\best")
+                    "ALL_model\\"+str(int(curTime))+"\\"+str(i)+"\\best.h5")
                 UseModel(NewGame,Testmodel)            
             except IOError:
                 pass   

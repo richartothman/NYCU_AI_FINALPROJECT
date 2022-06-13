@@ -30,7 +30,7 @@ def UseModel(game,Model,full = False,draw = True):
             pygame.display.flip()
 
 if __name__ == '__main__':
-    ModelID = 1655022538
+    ModelID = 1655052138
     model = tensorflow.keras.Sequential()
     model.add(tensorflow.keras.layers.Dense(16, activation="relu"))
     model.add(tensorflow.keras.layers.Dense(8, activation="relu"))
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     for i in range(1,MoveNum+1):
         tensorflow.keras.utils.get_custom_objects().update({'mapping_to_target_range': tensorflow.keras.layers.Activation(mapping_to_target_range)})
         Testmodel = tensorflow.keras.models.load_model(
-            "ALL_model\\"+str(int(ModelID))+"test\\"+str(i)+"\\best.h5")                                          
+            "ALL_model\\"+str(int(ModelID))+"\\"+str(i)+"\\best.h5")                                          
         UseModel(NewGame,Testmodel)
         # Testmodel.save("ALL_model\\"+str(int(ModelID))+"test\\"+str(i)+"\\best.h5")
 
