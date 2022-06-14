@@ -3,26 +3,20 @@
 
 ![poolpic](https://user-images.githubusercontent.com/91297984/173284035-3f8c9f02-f546-441b-b88e-6ef3921cd84c.png)
 ## Description
-An in-depth paragraph about your project and overview of use.
+Pool AI using NN+GA
 
 ## Getting Started
 
 ### Dependencies
 
-* Describe any prerequisites, libraries, OS version, etc., needed before installing program.
-* ex. Windows 10
-
-### Installing
-
-* How/where to download your program
-* Any modifications needed to be made to files/folders
+Using Python 3.9
+with Tensorflow, pygad and pygames
 
 ### Executing program
 
-* How to run the program
-* Step-by-step bullets
+* Run AI_Test.py on python
 ```
-code blocks for commands
+python AI_Test.py
 ```
 
 ## Authors
