@@ -1,7 +1,4 @@
-from matplotlib.pyplot import gray
 import pygame
-import sys
-import time
 from math import *
 import Pool 
 

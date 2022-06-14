@@ -1,8 +1,6 @@
-from copy import deepcopy
-import numpy
 import pygame
 import Pool
-from math import pi,radians
+from math import radians
 
 if __name__ == '__main__':
     NewGame = Pool.Game()

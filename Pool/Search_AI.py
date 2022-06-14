@@ -1,9 +1,7 @@
 from copy import deepcopy
-import numpy
 import pygame
 import Pool
-import time
-from math import pi,radians
+from math import radians
 
 def Generate_Bestshots(game):
     shot = None
